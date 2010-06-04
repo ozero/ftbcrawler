@@ -6,7 +6,7 @@ set_time_limit(0);
 $conf=array();
 
 //使用OSがWindowsか win/unix
-$conf['os'] = (isset($_ENV['windir']))?'win':'unix';
+$conf['os'] = (isset($_SERVER['windir']))?'win':'unix';
 
 //define: directory sepaleator string
 $conf['dirspl']['win'] = "\\";
@@ -14,7 +14,7 @@ $conf['dirspl']['unix'] = "/";
 define('DS',$conf['dirspl'][$conf['os']]);
 
 //画像データを保存するディレクトリの指定
-$conf['img_dir'] = "img".DS.date("Y-m-d").DS;
+$conf['img_dir'] = "img".DS;
 
 //define: 文字コード設定
 $conf['cs']['_fs']['win'] = "sjis-win";

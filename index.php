@@ -8,20 +8,21 @@ if ( !function_exists('mime_content_type') ) {
   }
 }
 
+//init
 require_once("downloadLib.class.php");
 require_once("collectLib.class.php");
-
 require_once("collectSiteFutaba.class.php");
+if(!file_exists('./img')){mkdir('./img');}
+if(!file_exists('./log')){mkdir('./log');}
+
 
 //収集キーワード
 //->単純に枚数でフィルタした方がよかったのでコメントアウト
 //$s_futaba_dec=array(
 //"エロ",
 //"耳",
-//"色",
 //"ケモノ",
 //"獣",
-//"スレ"
 //);//
 
 //除外キーワード

@@ -136,7 +136,7 @@ class downloadLib{
       }
     //GET
     }else if(preg_match("/GET/i",$method)){
-      curl_setopt($ch,CURLOPT_GET,1);
+      curl_setopt($ch,CURLOPT_HTTPGET,true);
       //パラメータ
       if($param_string != ""){
         curl_setopt($ch,CURLOPT_GETFIELDS,$param_string); 
@@ -261,14 +261,14 @@ class downloadLib{
 
 
   //同名の何ぞなファイルが有るか
-  public function save_path_detect($url,$subject,$file_ext){
+  public function save_path_detect($url,$subject,$file_ext,$datestr=null){
     //ファイル名はpathから適当につける
     $this->file_name = $this->get_file_name($url,$file_ext);
     
     //ディレクトリ名に使えない文字のエスケープ
     $subject = $this->dir_name_escape($subject);
     //パス指定
-    $file_dir_str = $this->conf['img_dir'].DS.$this->service.DS.$subject.DS;
+    $file_dir_str = $this->conf['img_dir'].DS.$this->service.DS.$datestr.DS.$subject.DS;
     $this->file_dir_str = mb_convert_encoding($file_dir_str,ENC_LOC,'auto');
     $this->file_dir=array(
       'a_imgdir'=>$this->conf['img_dir'],
@@ -288,10 +288,10 @@ class downloadLib{
   
   
   //画像を保存する
-  public function save_file($url,$subject,&$url_data,$file_ext){
+  public function save_file($url,$subject,&$url_data,$file_ext,$datestr=null){
     
     //ファイル名、保存先を生成する
-    $this->save_path_detect($url,$subject,$file_ext);
+    $this->save_path_detect($url,$subject,$file_ext,$datestr);
     $file_path = $this->file_path;
     $file_name = $this->file_name;
     $file_dir_str = $this->file_dir_str;

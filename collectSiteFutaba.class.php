@@ -10,8 +10,6 @@ function collect($arg){
 
   //ふたば掲示板のタイトルが格納される正規表現を指定する。
   //ふたばはタイトルよりも※1のbody見たほうがいいよ
-  //$conf['futaba_title'] = "/<font color=#cc1105 size=\+1><b>(.*?)<\/b><\/font>/";
-  $this->conf['futaba_title'] = "/<blockquote>(.*?)<\/blockquote>/";
 
   //ふたば掲示板の「返信」リンクの名称を指定する。この名称が含まれるリンクを巡回するようになってるよ
   $this->conf['futaba_res'] = "返信";
@@ -33,7 +31,7 @@ try{
 
   //文字コードをセット
   $this->dl->cs_web = $this->conf['cs']['futaba'];
-
+	
   //ダウンロード
   $top_page = $this->dl->download($url);
   $this->e_web2loc($top_page,$this->conf['cs']['futaba']);
@@ -95,15 +93,27 @@ try{
       //rgfx::add
       $thread_data=preg_replace("/[\r\n\s]/","",$thread_data);
       $thread_data=str_replace("<br>","_",$thread_data);
-      //DL条件キーワードとマッチさせる部分を抜き出す
-      if(preg_match($this->conf['futaba_title'],$thread_data,$matches)){
+      //スレタイというよりもスレ立て時コメントをタイトルとする
+      if(preg_match("/<blockquote>(.*?)<\/blockquote>/",$thread_data,$matches)){
         $thread_title = $matches[1];
-        $thread_title=mb_substr($thread_title,0,30,'sjis-win');//rgfx::add
+        $thread_title=mb_substr($thread_title,0,30,ENC_LOC);//rgfx::add
       }else{
         $thread_title = "無題";
       }
-      $this->err("ftb:th:getFirstComment:{$thread_title}\n");
-
+      //$this->err("ftb:th:getFirstComment:{$thread_title}\n");
+      //ついでにスレ立て日時、スレ立て番号もゲット。
+      preg_match("/#117743\'\>(.*?)\<blockquote\>/",$thread_data,$matches);
+      $thread_moretitle = $matches[1];
+      $thread_moretitle = preg_replace("/\<b\>.*?\<\/font\>/","",$thread_moretitle);
+      $thread_moretitle = preg_replace("/\<a.*?$/","",$thread_moretitle);
+      $thread_moretitle = preg_replace("/\s/","",$thread_moretitle);
+      preg_match("/No.(.*?)$/",$thread_moretitle,$matches);
+      $thread_num = $matches[1];
+      preg_match("/(.*?)\(.*?$/",$thread_moretitle,$matches);
+      $thread_date = $matches[1];
+      $thread_date = "20".preg_replace("/[^0-9]/","_",$thread_date);
+      $thread_title = "{$thread_title}_{$thread_num}";
+      
       $keyword_flag = true;
 //      //キーワード指定がある場合はスレッドタイトルが検索ワードにひっかかってるかをキーワードフラグに保存
 //      if($keyword != null){
@@ -188,7 +198,8 @@ try{
         //$this->err("ftb:th:match:img:embed: {$thread_page_link_url}\n");
         
         //
-        if(!$this->dl->save_path_detect($thread_page_link_url,$thread_title,$file_ext)){
+        if(!$this->dl->save_path_detect($thread_page_link_url,
+        	$thread_title,$file_ext,$thread_date)){
           continue;
         }
         
@@ -206,7 +217,8 @@ try{
           continue;
         }
         //データを保存する
-        $save_file = $this->dl->save_file($thread_page_link_url,$thread_title,$url_data,$file_ext);
+        $save_file = $this->dl->save_file($thread_page_link_url,
+        	$thread_title,$url_data,$file_ext,$thread_date);
         if($save_file == true){
           //$this->err("ftb:th:onJobTopic:{$thread_url}\n");
           //$this->err("ftb:th:onJobFirstComment:{$thread_title}\n");
@@ -241,26 +253,8 @@ try{
       $thread_page_html_src=preg_replace(
         "#http\:\/\/#",
         "",$thread_page_html_src);
-      $res = $this->dl->save_file("/index",$thread_title,$thread_page_html_src,'html');
-      
-//      #スレのダウンロードが終わったなら、中の画像数を3桁にformatしてフォルダ名に足す
-//      $olddirname=".".DS.str_replace("\\\\","\\",join(DS,$this->dl->file_dir));
-//      $this->e_web2loc($olddirname, 'utf-8');
-//      if(file_exists( $olddirname )){
-//        $saved_files=scandir( $olddirname );
-//        //rename
-//        $newdirname = ".".DS."\\".$this->dl->file_dir['a_imgdir']
-//          .DS.$this->dl->file_dir['b_service']
-//          .DS."[".sprintf("%03d",count($saved_files)-3)."]"
-//          .$this->dl->file_dir['c_subject'];
-//        $this->e_web2loc($newdirname, 'utf-8');
-//        rename( $olddirname , $newdirname);
-//        $this->err("ftb:保存先を改名しました\n");
-//      }else{
-//        $this->err("ftb:保存先が見つかりません\n");
-//      }
-      
-      
+      $res = $this->dl->save_file("/index",
+      	$thread_title,$thread_page_html_src,'html',$thread_date);
       
     }
   }
