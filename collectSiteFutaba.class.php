@@ -197,7 +197,7 @@ try{
         $thread_page_link_url = $thread_page_link[1];
         //$this->err("ftb:th:match:img:embed: {$thread_page_link_url}\n");
         
-        //
+        //既に取得した画像ならスキップ
         if(!$this->dl->save_path_detect($thread_page_link_url,
         	$thread_title,$file_ext,$thread_date)){
           continue;
