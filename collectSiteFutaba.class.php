@@ -222,7 +222,7 @@ try{
         if($save_file == true){
           //$this->err("ftb:th:onJobTopic:{$thread_url}\n");
           //$this->err("ftb:th:onJobFirstComment:{$thread_title}\n");
-          $this->err("ftb:saved:{$thread_page_link_url} ({$k0}/{$loopmax})"
+          $this->err("ftb:saved:{$thread_page_link_url} ({$loop}/{$loopmax})"
             ." / wait:({$this->conf['retry_wait']}) \n");
           //$this->err("  -- thread_title {$thread_title}\n");
           //wait
